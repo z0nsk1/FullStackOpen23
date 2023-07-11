@@ -1,3 +1,4 @@
+// Otsikon luova komponentti
 const Header = (props) => {
   console.log(props)
   return (
@@ -7,6 +8,7 @@ const Header = (props) => {
   )
 }
 
+// Sisällön osat luova komponentti
 const Part = (props) => {
   console.log(props)
   return (
@@ -15,6 +17,7 @@ const Part = (props) => {
 
 }
 
+// Sisällön luova komponentti
 const Content = (props) => {
   console.log(props)
   return (
@@ -27,6 +30,7 @@ const Content = (props) => {
   )
 }
 
+// Komponentti, joka laskee muiden kenttien lukujen yhteismäärän
 const Total = (props) => {
   console.log(props)
   return (
