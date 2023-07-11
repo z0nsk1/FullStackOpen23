@@ -10,24 +10,49 @@ const Header = ({ props }) => (
   <h1>{props}</h1>
 )
 
-const Statistics = ({text, value}) => {
-  if (text === "positive") {
+const Statistics = ({ good, neutral, bad, all }) => {
+  return (
+    <table>
+      <StatisticLine text={'good'} value={good}/>
+      <StatisticLine text={'neutral'} value={neutral}/>
+      <StatisticLine text={'bad'} value={bad}/>
+      <StatisticLine text={'all'} value={all}/>
+      <StatisticLine text={'average'} value={(good - bad) / all}/>
+      <StatisticLine text={'positive'} value={(good / all) * 100}/>
+    </table>
+  )
+}
+
+const StatisticLine = ({ text, value }) => {
+  // Prosenttimerkki paikalle, ei kovin järkevä toteutus
+  if (text === 'positive') {
     return (
-      <p>{text} {value} %</p>
+      <tbody>
+      <tr>
+        <td>{text}</td>
+        <td>{value} %</td>
+      </tr>
+    </tbody>
     )
   }
   return (
-    <p>{text} {value}</p>
+    <tbody>
+      <tr>
+        <td>{text}</td>
+        <td>{value}</td>
+      </tr>
+    </tbody>
   )
 }
 
 const App = () => {
-  // tallenna napit omaan tilaansa
+  // napeille omat tilat
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
   const [all, setAll] = useState(0)
 
+  // Palautteiden käsittelijät
   const handleGood = () => {
     console.log('Adding good feedback... value before', good)
     setGood(good + 1)
@@ -46,6 +71,7 @@ const App = () => {
     setAll(all + 1)
   }
 
+  // jos palautteita ei ole, tulostetaan "no feedback given"
   if (all === 0) {
     return (
       <div>
@@ -58,6 +84,7 @@ const App = () => {
       </div>
     )
   }
+  // muussa tapauksessa tulostetaan palautteet
   return (
     <div>
       <Header props={'give feedback'}/>
@@ -65,14 +92,7 @@ const App = () => {
       <Button handleClick={handleNeutral} text='neutral' />
       <Button handleClick={handleBad} text='bad' />
       <Header props={'statistics'}/>
-      <div style={{lineHeight:'5px'}}>
-        <Statistics text={'good'} value={good}/>
-        <Statistics text={'neutral'} value={neutral}/>
-        <Statistics text={'bad'} value={bad}/>
-        <Statistics text={'all'} value={all}/>
-        <Statistics text={'average'} value={(good - bad) / all}/>
-        <Statistics text={'positive'} value={(good / all) * 100}/>
-      </div>
+      <Statistics good={good} neutral={neutral} bad={bad} all={all}/>
     </div>
   )
 }
