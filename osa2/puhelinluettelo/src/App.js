@@ -31,6 +31,8 @@ const addPerson = (event) => {
   setNewNumber('')
 }
 
+console.log('personToShow filter: ', filter)
+const personsToShow = persons.filter(person => person.name.toLowerCase().startsWith(filter.toLowerCase()))
 
 // Nimikentän tapahtumankäsittelijä
 const handleNewName = (event) => {
@@ -62,7 +64,7 @@ const handleFilter = (event) => {
       </form>
       <h2>Numbers</h2>
       <div>
-        {persons.map(person => <p key={person.name}>{person.name} {person.number}</p>)}
+        {personsToShow.map(person => <p key={person.name}>{person.name} {person.number}</p>)}
       </div>
     </div>
   )
