@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 const Filter = ({filter, handleFilter}) => (
   <form>
@@ -6,6 +7,7 @@ const Filter = ({filter, handleFilter}) => (
   </form>
 )
 
+//  Komponentti, joka filtteröi näytettävät henkilöt
 const Persons = ({persons, filter}) => {
   const personsToShow = persons.filter(person => person.name.toLowerCase().startsWith(filter.toLowerCase()))
   return (
@@ -14,6 +16,7 @@ const Persons = ({persons, filter}) => {
     </div>
 )}
 
+// Henkilön verkkosivulle lisäävä komponentti
 const AddPerson = ({addPerson, newName, newNumber, handleNewName, handleNewNumber}) => (
   <form onSubmit={addPerson}>
   <div> name: <input value={newName} onChange={handleNewName}/></div>
@@ -23,15 +26,24 @@ const AddPerson = ({addPerson, newName, newNumber, handleNewName, handleNewNumbe
 )
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('Lisää uusi yhteystieto')
   const [newNumber, setNewNumber] = useState('Lisää numero')
   const [filter, setFilter] = useState('')
+
+  // Efekti
+  const hook = () => {
+    console.log('Effect')
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        console.log('Promise fulfilled')
+        setPersons(response.data)
+      })
+  }
+  
+  console.log('Rendering', persons.length, 'persons')
+  useEffect(hook, [])
 
 const addPerson = (event) => {
   event.preventDefault() // estetään lomakkeen lähetys
