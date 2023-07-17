@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Note from './components/Note'
-import axios from 'axios'
+import noteService from './services/notes' // siirrettiin url käsittelyt omalle moduulille
 
 /*const promise = axios
   .get('http://localhost:3001/notes')
@@ -16,14 +16,12 @@ console.log(promise)*/
 //const promise2 = axios.get('http://localhost:3001/foobar')
 //console.log(promise2)
 
-const App = ( props ) => {
+const App = () => {
   const [notes, setNotes] = useState([])
-  const [newNote, setNewNote] = useState(
-    'a new note...'
-  )
+  const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(true)
 
-  const hook = () => {
+    /*const hook = () => {
     console.log('effect')
     axios
       .get('http://localhost:3001/notes')
@@ -37,16 +35,15 @@ const App = ( props ) => {
   useEffect(hook, []) //funktiolle useEffect annetaan kaksi parametria, ensimmäinen on funktio eli efekti
   // ja toinen parametri tarkentaa, miten usein efekti suoritetaan. Kun toisena parametrina on tyhjä
   // taulukko, efekti suoritetaa ainoastaan komponentin ensimmäisen renderöinnin jälkeen
-  // oletusarvoisesti efekti suoritetaa aina, kun komponentti renderöidään
+  // oletusarvoisesti efekti suoritetaa aina, kun komponentti renderöidään*/
 
-
-  // input-komponentin tapahtumankäsittelijä
-  // kutsutaan aina, kun syötekomponentissa tapahtuu jotain, parametrina tapahtumaolio event
-  // preventDefault:a ei tarvita tässä, sillä syötekentän muutoksella ei ole oletusarvoista toimintaa
-  const handleNoteChange = (event) => {
-    console.log(event.target.value) // kenttä target vastaa tässä kontrolloitua input-kenttää ja value viittaa syötekentä arvoon
-    setNewNote(event.target.value)
-  }
+  useEffect(() => {
+    noteService
+      .getAll()
+      .then(initialNotes => {
+        setNotes(initialNotes)
+      })
+  }, [])
 
   const addNote = (event) => {
     event.preventDefault() // estää lomakkeen lähetyksen oletusarvoisen toiminnan (sivun uudelleenlatautuminen)
@@ -54,11 +51,59 @@ const App = ( props ) => {
     const noteObject = { // uutta muistiinpanoa vastaava olio, sisältö komponentin tilasta newNote
       content: newNote,
       important: Math.random() > 0.5, // muistiinpano on 50% "tärkeä"
-      id: notes.length + 1,
     }
-    setNotes(notes.concat(noteObject)) // lisätään muistiinpano vanhojen joukkoon
-    // setNotes metodi luo uuden taulukon, joka sisältää lisättävän alkion. REACTIN TILAA EI SAA MUUTTAA
-    setNewNote('') // tyhjentää syötekenttää kontrolloivan tilan newNote
+
+    noteService
+      .create(noteObject)
+      .then(returnedNote => {
+        setNotes(notes.concat(returnedNote))
+        setNewNote('')
+      })
+
+    /*
+    axios                                            // lähetetään uusi muistiinpano palvelimelle axioksen post-metodilla
+    .post('http://localhost:3001/notes', noteObject) // lähetetty data on JavaScript-olio, joten axios osaa automaattisesti 
+    .then(response => {                              // asettaa pyynnön Content-type headerille oikean arvon eli application/json 
+      setNotes(notes.concat(response.data))          // lisätään vielä uusi muistiinpano näkyviin, muista: concat ei muuta komponentin
+      setNewNote('')                                 // alkuperäistä tilaa, vaan luo uuden taulukon. setNewNote:lla tyhjennetään vielä
+      console.log(response)                          // lomakkeen teksti        
+    })*/
+  }
+
+  const toggleImportanceOf = (id) => {
+    // const url = `http://localhost:3001/notes/${id}` // jokaisen muistiinpanon yksilöivä url
+    const note = notes.find(n => n.id === id)       // find etsii muutettavan muistiinpanon ja talletetaan sen viite note:en
+    const changedNote = {...note, important: !note.important } // luodaan uusi olio, jonka sisältö on sama kuin vanhassa oliossa,
+                                                               // pois lukien kenttä important, josta tulee päinvastainen
+                                                               // huom. ...note on object spread -syntaksia, joka kopioi olion
+    noteService // siirrettiin url käsittelyt omalle moduulille
+      .update(id, changedNote)
+      .then(returnedNote => {
+        setNotes(notes.map(note => note.id !== id ? note : returnedNote))
+      })
+      .catch(error => {
+        alert(
+          `the note '${note.content}' was already deleted from server`
+        )
+        setNotes(notes.filter(n => n.id !== id))
+      })
+
+    /*axios.put(url, changedNote).then(response => { // put-pyyntö korvaa aiemman muistiinpanon
+      setNotes(notes.map(note => note.id !== id ? note : response.data)) // takaisinkutsufunktiossa asetetaan komponentin App tilaan
+      // notes kaikki vanhat muistiinpanot, paitsi muuttunut, josta tilaan asetetaan palvelimen palauttama versio 
+    })*/
+
+
+    /* console.log(`importance of ${id} need to be toggled`) // ${id} vastaa samaa kuin '...' + id + '...', huom. eri hipsumerkki*/
+  }                                                       // ES6 template string -ominaisuuden ansiosta on mahdollisuus kirjottaa 
+                                                          // asia siistimmin 
+
+  // input-komponentin tapahtumankäsittelijä
+  // kutsutaan aina, kun syötekomponentissa tapahtuu jotain, parametrina tapahtumaolio event
+  // preventDefault:a ei tarvita tässä, sillä syötekentän muutoksella ei ole oletusarvoista toimintaa
+  const handleNoteChange = (event) => {
+    console.log(event.target.value) // kenttä target vastaa tässä kontrolloitua input-kenttää ja value viittaa syötekentä arvoon
+    setNewNote(event.target.value)
   }
 
   //määrittely ehdollisella operaattorilla
@@ -77,9 +122,15 @@ const App = ( props ) => {
         </button>
       </div>
       <ul>
-        {notesToShow.map(note =>
-          <Note key={note.id} note={note}/>
-        )}
+        <ul>
+          {notesToShow.map(note =>
+            <Note 
+              key={note.id} 
+              note={note} 
+              toggleImportance={() => toggleImportanceOf(note.id)}
+            />
+          )}
+        </ul>
       </ul>
       <form onSubmit={addNote}>
         <input 
