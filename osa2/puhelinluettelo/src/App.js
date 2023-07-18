@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import personService from './communication/persons'
+import './index.css'
 
 const Filter = ({filter, handleFilter}) => (
   <form>
@@ -13,7 +14,6 @@ const Persons = ({person, removePerson}) => {
       {person.name} {person.number}
       <button onClick={() => {
         if (window.confirm(`Delete ${person.name}?`)) {
-          //window.alert(`OK, deleting ${person.name}!`)
           removePerson(person.id)
         }
       }}>
@@ -31,13 +31,39 @@ const AddPerson = ({addPerson, newName, newNumber, handleNewName, handleNewNumbe
 </form>
 )
 
+// Ilmoituksen käsittelevä komponentti, tulostaa statusviestin, jos se ei ole null
+const Notification = ( {message} ) => {
+  if (message === null) {
+    return null
+  }
+  return (
+    <div className='status'> 
+      {message}
+    </div>
+  )
+}
+
+const Error = ( {message} ) => {
+  if (message === null) {
+    return null
+  }
+  return (
+    <div className='error'> 
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [statusMessage, setStatusMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
-useEffect (() => {
+// Näytetään henkilölista efektin avulla. Efekti kutsuu getAll() metodia, missä axios hakee 
+useEffect (() => {  // henkilölistan serveriltä
   personService
     .getAll()
     .then(initialPersons => {
@@ -51,34 +77,36 @@ const removePerson = (id) => {
   console.log('Poistettavan henkilön id: ', removedPerson.id)
   
   personService
-    .remove(removedPerson.id)
+    .remove(removedPerson.id) // remove metodissa axios välittää remove-pyynnön palvelimelle
     .then(returnedPerson => {
-      setPersons(persons.filter(p => p.id !== id))
+      console.log(returnedPerson)
+      setPersons(persons.filter(p => p.id !== id))  // näytetään muut, paitsi poistettu henkilö
+      setStatusMessage(`Person '${removedPerson.name}' was deleted`) 
+      setTimeout(() => {setStatusMessage(null)}, 4000)
     })
     .catch(error => {
-      alert(
-        `Error, deleting failed`
-      )
+      setErrorMessage(`Deleting failed: Person '${removedPerson.name}' was already deleted from the server`)
+      setTimeout(() => {setErrorMessage(null)}, 4000)
       setPersons(persons.filter(p => p.id !== id))
     })
 }
 
 const updateNumber = (newPerson) => {
-  const person = persons.find(p => p.name === newPerson.name)
+  const person = persons.find(p => p.name === newPerson.name) // Etsitään henkilö listasta nimen perusteella
   console.log(person)
-  const changedPerson = {...person, number: newPerson.number}
+  const changedPerson = {...person, number: newPerson.number} // kopioidaan henkilöolio ja vaihdetaan number-kenttään uusi numero
   console.log(changedPerson)
 
   personService
-    .updateNumber(person.id, changedPerson)
+    .updateNumber(person.id, changedPerson) // updateNumber metodissa axios välittää put-pyynnön palvelimelle
     .then(returnedPerson => {
-      setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
+      setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson)) 
+      setStatusMessage(`${returnedPerson.name}'s number was updated, new number is ${returnedPerson.number}`)
+      setTimeout(() => {setStatusMessage(null)}, 4000)
     })
     .catch(error => {
-      alert(
-        `Error, updating failed`
-      )
-      setPersons(persons.filter(p => p.id !== person.id))
+      setErrorMessage(`Updating failed: Person '${changedPerson.name}' was already deleted from the server`)
+      setTimeout(() => {setErrorMessage(null)}, 4000)
     })
 }
 
@@ -100,13 +128,20 @@ const addPerson = (event) => {
     )}
   } else {
       personService
-      .create(newPerson)
+      .create(newPerson) // create-metodissa axios välittää post-pyynnön palvelimelle
       .then(returnedPerson => {
         console.log(returnedPerson)
-        setPersons(persons.concat(returnedPerson))
+        setPersons(persons.concat(returnedPerson)) // liitetään uusi henkilö henkilölistaan, jotta se näkyy sivulla
         console.log('New person added:', returnedPerson.name)
-        setNewName('')
-        setNewNumber('')
+        setStatusMessage(`Added '${returnedPerson.name}'`)
+        setTimeout(() => {setStatusMessage(null)}, 4000)
+        setNewName('') //tyhjennetään name-kenttä
+        setNewNumber('') //tyhjennetään number-kenttä
+    })
+    .catch(error => {
+      console.log(`Person's '${newPerson.name}' adding was failed`)
+      setErrorMessage(`Person's '${newPerson.name}' adding was failed`)
+      setTimeout(() => {setErrorMessage(null)}, 4000)
     })
   }
 }
@@ -132,6 +167,8 @@ const handleFilter = (event) => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={statusMessage} />
+      <Error message={errorMessage} />
       <Filter filter={filter} handleFilter={handleFilter}/>
       <h2>Add a new contact</h2>
       <AddPerson addPerson={addPerson} newName={newName} newNumber={newNumber} handleNewName={handleNewName} handleNewNumber={handleNewNumber}/>
