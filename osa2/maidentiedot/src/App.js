@@ -8,21 +8,22 @@ const [input, setInput] = useState('')
 const [countries, setCountries] = useState([])
 const [filteredCountries, setFilteredCountries] = useState([])
 
-useEffect (() => {
+useEffect (() => { // Haetaan maiden tiedot apin kautta
   axios
     .get(`https://studies.cs.helsinki.fi/restcountries/api/all`)
     .then(response => {
       console.log('axios.get response: ', response.data)
-      setCountries(response.data)
+      setCountries(response.data) // tallennetaan maiden tiedot
     })
 }, [])
 
 const handleInput = (event) => {
-  const filter = event.target.value
+  const filter = event.target.value 
   console.log(filter)
-  setInput(event.target.value)
+  setInput(filter)
+  // inputtia ei voi käyttää fitterinä, koska se ei päivity jatkuvasti ja filtteröi edellisen arvon perusteella
   if (filter) {
-    const filtered = countries
+    const filtered = countries 
     .filter(country => country.name.common.toLowerCase().includes(filter.toLowerCase()))
     setFilteredCountries(filtered)
     console.log(filtered)
@@ -36,7 +37,7 @@ const handleInput = (event) => {
           Find countries: <input value={input} onChange={handleInput}/>
         </form>
       </div>
-      <ShowCountries countries={filteredCountries}/>
+      <ShowCountries countries={filteredCountries} setCountries={setFilteredCountries}/>
     </div>
   )
 }
