@@ -1,64 +1,42 @@
 import axios from 'axios'
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
+import ShowCountries from './components/ShowCountries'
 
-const Find = ({ input, handleInput }) => (
-    <form>
-      <p>Find countries <input value={input} onChange={handleInput}/></p>
-    </form>
-)
-
-const Country = ({ country }) => {
-  console.log('Country-object in Country-component: ', country);
-  return (
-    <div>
-      <h1>{country.name.common}</h1>
-      <p>Capital {country.capital}</p> 
-      <p>Area {country.area}</p>
-      <h3>Languages: </h3>
-      <ul>
-        {Object.values(country.languages).map(lang => <li key={lang}>{lang}</li>)}
-      </ul>
-    </div>
-  )
-}
-
-const Picture = ({ pic }) => {
-  console.log('Type of picture variable in Picture-component: ', typeof pic)
-  return (
-    <img src={pic} alt="flag" border="1px black"/>
-  )
-}
 const App = () => {
 
-const [input, setInput] = useState('finland')
-const [country, setCountry] = useState(null)
-const [picture, setPicture] = useState(null)
+const [input, setInput] = useState('')
+const [countries, setCountries] = useState([])
+const [filteredCountries, setFilteredCountries] = useState([])
 
 useEffect (() => {
-    axios
-      .get(`https://studies.cs.helsinki.fi/restcountries/api/name/finland`)
-      .then(response => {
-        console.log('axios.get response: ', response.data)
-        setCountry(response.data)
-        setPicture(response.data.flags.png)
-      })
+  axios
+    .get(`https://studies.cs.helsinki.fi/restcountries/api/all`)
+    .then(response => {
+      console.log('axios.get response: ', response.data)
+      setCountries(response.data)
+    })
 }, [])
 
-// estetään renderöinti, jos country on tyhjä vielä
-if (!country) {
-  return null
-}
-
 const handleInput = (event) => {
-  console.log(event.target.value)
+  const filter = event.target.value
+  console.log(filter)
   setInput(event.target.value)
+  if (filter) {
+    const filtered = countries
+    .filter(country => country.name.common.toLowerCase().includes(filter.toLowerCase()))
+    setFilteredCountries(filtered)
+    console.log(filtered)
+  }
 }
 
   return (
     <div>
-      <Find input={input} handleInput={handleInput}/>
-      <Country country={country}/>
-      <Picture pic={picture}/>
+      <div>
+        <form>
+          Find countries: <input value={input} onChange={handleInput}/>
+        </form>
+      </div>
+      <ShowCountries countries={filteredCountries}/>
     </div>
   )
 }
