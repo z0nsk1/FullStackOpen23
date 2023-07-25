@@ -148,7 +148,7 @@ const addPerson = (event) => {
 
 // Näytettävät henkilöt
 const personsToShow = persons
-.filter(person => person.name.toLowerCase().startsWith(filter.toLowerCase()))
+.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
 
 // Nimikentän tapahtumankäsittelijä
 const handleNewName = (event) => {
