@@ -12,7 +12,7 @@ const Country = ({ country }) => {
     axios
       .get(`https://api.openweathermap.org/data/2.5/weather?q=${country.capital}&units=metric&appid=${api_key}`)
       .then(response => {
-        setWeather(response.data)
+        setWeather(response.data) // tilan muutos renderöi komponentin uudestaan
         console.log(response.data)
       }).catch(error => {
         console.log(error)
@@ -20,7 +20,9 @@ const Country = ({ country }) => {
     }
   },[])
 
-  if (weather !== null) {
+  if (weather !== null) { // Jos sää on null, ei renderöidä säätietoja (error), kokeiltu samaa käyttäen tilana 
+    // tyhjää taulukkoa ja ehtona weather.length > 0, ei kuitenkaan toiminut, miksi?
+    // muista, hook (useEffect) renderöityy vasta ensimmäisen renderöinnin (return) jälkeen
     console.log(weather.weather[0].icon)
     console.log(weather)
     return (
@@ -30,7 +32,9 @@ const Country = ({ country }) => {
         <p>Area {country.area}</p>
         <h3>Languages: </h3>
         <ul>
-          {Object.values(country.languages).map(lang => <li key={lang}>{lang}</li>)}
+          {Object.values(country.languages).map(lang => <li key={lang}>{lang}</li>)} 
+          {/*mapataan olion country kentän languages arvot li-elementteihin, tämä siksi, 
+          jos puhuttuja kieliä on useampi*/}
         </ul>
         <img src={country.flags.png} alt="flag" border="1px black" width="20%" height="20%"/>
       <h2>Weather in {country.capital}</h2>
@@ -40,18 +44,6 @@ const Country = ({ country }) => {
       </div>
     )  
   }
-      return (
-        <div>
-        <h1>{country.name.common}</h1>
-        <p>Capital {country.capital}</p> 
-        <p>Area {country.area}</p>
-        <h3>Languages: </h3>
-        <ul>
-          {Object.values(country.languages).map(lang => <li key={lang}>{lang}</li>)}
-        </ul>
-        <img src={country.flags.png} alt="flag" border="1px black" width="20%" height="20%"/>
-      </div>
-      )
-  }
+}
 
   export default Country

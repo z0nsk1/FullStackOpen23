@@ -14,14 +14,17 @@ useEffect (() => { // Haetaan maiden tiedot apin kautta
     .then(response => {
       console.log('axios.get response: ', response.data)
       setCountries(response.data) // tallennetaan maiden tiedot
-    })
+    }).catch(error =>
+      console.log(error))
 }, [])
 
 const handleInput = (event) => {
   const filter = event.target.value 
   console.log(filter)
   setInput(filter)
-  // inputtia ei voi käyttää fitterinä, koska se ei päivity jatkuvasti ja filtteröi edellisen arvon perusteella
+  // inputtia ei voi käyttää fitterinä, koska se ei päivity jatkuvasti ja filtteröi 
+  // edellisen arvon perusteella, käytettääb mielummin event.target.value:a
+  // periaatteessa input tila tällöin turha, mutta miten siten syötteen tallennus input-kentässä?
   if (filter) {
     const filtered = countries 
     .filter(country => country.name.common.toLowerCase().includes(filter.toLowerCase()))
