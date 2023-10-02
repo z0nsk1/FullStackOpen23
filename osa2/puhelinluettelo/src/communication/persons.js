@@ -1,8 +1,6 @@
 import axios from 'axios'
 
-// Axios:n metodit käsittelevä moduuli
-
-const baseUrl = 'http://localhost:3001/persons'
+const baseUrl = 'http://localhost:3001/api/persons'
 
 // Haetaan kaikki tiedot palvelimelta
 const getAll = () => {
@@ -18,7 +16,7 @@ const create = newObject => {
 
 // Datan poisto palvelimelta
 const remove = (id) => {
-    console.log(`${baseUrl}/${id}`)
+    console.log(`Deleting ${baseUrl}/${id}`)
     const request = axios.delete(`${baseUrl}/${id}`)
     return request.then(response => response.data)
 }
