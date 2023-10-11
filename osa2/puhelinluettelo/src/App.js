@@ -139,8 +139,10 @@ const addPerson = (event) => {
         setNewNumber('') //tyhjennetään number-kenttä
     })
     .catch(error => {
-      console.log(`Person's '${newPerson.name}' adding was failed`)
-      setErrorMessage(`Person's '${newPerson.name}' adding was failed`)
+      console.log(error.response.data.error)
+      //console.log(`Person's '${newPerson.name}' adding was failed`)
+      //setErrorMessage(`Person's '${newPerson.name}' adding was failed`)
+      setErrorMessage(error.response.data.error)
       setTimeout(() => {setErrorMessage(null)}, 4000)
     })
   }
