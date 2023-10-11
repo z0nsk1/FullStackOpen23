@@ -105,7 +105,9 @@ const updateNumber = (newPerson) => {
       setTimeout(() => {setStatusMessage(null)}, 4000)
     })
     .catch(error => {
-      setErrorMessage(`Updating failed: Person '${changedPerson.name}' was already deleted from the server`)
+      //setErrorMessage(`Updating failed: Person '${changedPerson.name}' was already deleted from the server`)
+      console.log(error.response.data.error)
+      setErrorMessage(error.response.data.error)
       setTimeout(() => {setErrorMessage(null)}, 4000)
     })
 }
