@@ -2,17 +2,10 @@ POST http://localhost:3001/api/blogs
 Content-Type: application/json
 
 
-//{
-//  "title": "MyDay",
-//  "author": "Erkki Esimerkki",
-//  "url": "http://localhost:3001/api/blogs",
-//  "likes": 5
-//}*
-
 {
-  "title": "Mikä on elämän tarkoitus?",
-  "author": "Polle Pohtija",
+  "title": "Full Stack devaus ei ole helppoa",
+  "author": "Julle Juniori",
   "url": "http://localhost:3001/api/blogs",
-  "likes": 16
+  "likes": 32
 }
 
