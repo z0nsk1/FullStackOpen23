@@ -18,7 +18,7 @@ test('right amount of blogs were returned', async () => {
 
 test('blogs are identified with id field', async () => {
   const res = await api.get('/api/blogs')
-  res.body.forEach(blog => { // Tarkistetaan forEach-silmukan avulla, että jokainen blogi sisältää id-kentän
+  res.body.forEach(blog => { // tarkistetaan forEach-silmukan avulla, että jokainen blogi sisältää id-kentän
     expect(blog.id).toBeDefined() // toBeDefined tarkistaa, että muuttuja ei ole määrittelemätön
   });
 })
