@@ -23,6 +23,23 @@ test('blogs are identified with id field', async () => {
   });
 })
 
+const testBlog = {
+  title: "Sample Blog",
+  author: "testiTimo",
+  url: "http://localhost:3001/api/blogs",
+  likes: 10
+}
+
+test('a new blog can be added', async () => {
+  await api.post('/api/blogs').send(testBlog)
+  const res = await api.get('/api/blogs')
+  expect(res.body).toHaveLength(4) // Määrän pitäisi kasvaa yhdellä
+  Object.values(res.body[3]).forEach(value => { // Tarkistetaan, että testiBlogin kentät eivät ole tyhjiä. Object.values palauttaa taulukon, joten tarvitaan silmukkaa
+    console.log(value)
+    expect(value).toBeTruthy() // ToBeTruthy tarkistaa, ettei datassa ole virheellisiä arvoja (false, 0, "", null, undefined ja NaN)
+  })
+})
+
 afterAll(async () => {
   await mongoose.connection.close() // suljetaan tietokantayhteys
 })
