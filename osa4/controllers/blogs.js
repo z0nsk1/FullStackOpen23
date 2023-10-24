@@ -12,15 +12,17 @@ blogsRouter.get('/', (request, response) => {
 })
 
 // Uuden blogin lisäys
-blogsRouter.post('/', (request, response) => {
+blogsRouter.post('/', (request, response, next) => {
   const body = request.body
   info(request.body)
+
+  info(body.likes)
 
   const blog = new Blog({
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes,
+    likes: body.likes === "" ? 0 : body.likes,
   })
 
   blog
@@ -28,7 +30,7 @@ blogsRouter.post('/', (request, response) => {
     .then(savedBlog => {
       response.status(201).json(savedBlog)
     }).catch(error => {
-        errorInfo(error.message)
+        next(error)
     })
 })
 

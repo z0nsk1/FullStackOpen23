@@ -4,6 +4,8 @@ const app = require('../app') // Testit käyttävät ainoastaan app.js määrite
 
 const api = supertest(app)
 
+const Blog = require('../models/blog')
+
 test('blogs are returned as json', async () => {
   await api
     .get('/api/blogs')
@@ -23,13 +25,6 @@ test('blogs are identified with id field', async () => {
   });
 })
 
-const testBlog = {
-  title: "Sample Blog",
-  author: "testiTimo",
-  url: "http://localhost:3001/api/blogs",
-  likes: 10
-}
-
 test('a new blog can be added', async () => {
   await api.post('/api/blogs').send(testBlog)
   const res = await api.get('/api/blogs')
@@ -38,6 +33,32 @@ test('a new blog can be added', async () => {
     console.log(value)
     expect(value).toBeTruthy() // ToBeTruthy tarkistaa, ettei datassa ole virheellisiä arvoja (false, 0, "", null, undefined ja NaN)
   })
+})
+
+test("if blog doesn't have title or url fields, response is statuscode 400 and blog is not added", async() => {
+  const testBlog1 = {
+    author: "testiTimo",
+    likes: 20
+  }
+
+  await api
+  .post('/api/blogs')
+  .send(testBlog1)
+  .expect(400)
+})
+
+test('if likes are not given, its value is set to 0', async () => {
+  const testBlog = {
+    title: "Sample Blog",
+    author: "testiTimo",
+    url: "http://localhost:3001/api/blogs",
+    likes: ""
+  }
+  await api
+  .post('/api/blogs')
+  .send(testBlog)
+  const res = await api.get('/api/blogs')
+  expect(res.body[4].likes).toBe(0)
 })
 
 afterAll(async () => {

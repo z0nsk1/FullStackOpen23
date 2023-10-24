@@ -3,9 +3,9 @@ Content-Type: application/json
 
 
 {
-  "title": "Full Stack devaus ei ole helppoa",
+  //"title": "Full Stack devaus ei ole helppoa",
   "author": "Julle Juniori",
   "url": "http://localhost:3001/api/blogs",
-  "likes": 32
+  "likes": ""
 }
 
