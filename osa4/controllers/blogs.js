@@ -2,34 +2,28 @@
 
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const { info, errorInfo } = require('../utils/logger')
+const logger = require('../utils/logger')
 
 // Olemassa olevien blogien hakeminen
-blogsRouter.get('/', (request, response) => {
-  Blog.find({}).then(blogs => {
-      response.json(blogs)
-    })
+blogsRouter.get('/', async (req, res) => {
+  const blogs = await Blog.find({})
+  res.json(blogs)
 })
 
 // Uuden blogin lisäys
-blogsRouter.post('/', (request, response) => {
-  const body = request.body
-  info(request.body)
+blogsRouter.post('/', async (req, res) => {
+  const { title, author, url, likes } = req.body
+  logger.info(req.body)
 
   const blog = new Blog({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes,
+    title: title,
+    author: author,
+    url: url,
+    likes: likes,
   })
 
-  blog
-    .save()
-    .then(savedBlog => {
-      response.status(201).json(savedBlog)
-    }).catch(error => {
-        errorInfo(error.message)
-    })
+  const addedBlog = await blog.save()
+  res.status(201).json(addedBlog)
 })
 
 module.exports = blogsRouter

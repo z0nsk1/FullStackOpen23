@@ -1,7 +1,6 @@
 // Tämä moduuli hoitaa blogin skeeman luomisen (skeema kertoo mongooselle, miten blogioliot tulee tallentaa tietokantaan)
 
 const mongoose = require('mongoose')
-const config = require('../utils/config')
 
 const blogSchema = new mongoose.Schema({
   title: String,
