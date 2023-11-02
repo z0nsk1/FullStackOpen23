@@ -4,7 +4,7 @@ const User = require('../models/user')
 const logger = require('../utils/logger')
 
 usersRouter.get('/', async(req, res) => {
-  const users = await User.find({})
+  const users = await User.find({}).populate('blogs') // populate-metodi suorittaa liitoksen useiden tietokantakyselyiden avulla, jotta saadaan /api/users näkyville muistiinpanojen sisältö
   res.json(users)
 })
 
@@ -23,14 +23,13 @@ usersRouter.post('/', async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, saltRounds)
 
   // Asetetaan uuden käyttäjän tiedot
-  const user = new User({
+  const newUser = new User({
     username,
     name,
     hashedPassword,
   })
-
   // Ja tallennetaan uusi käyttäjä
-  const addedUser = await user.save()
+  const addedUser = await newUser.save()
   res.status(201).json(addedUser)
   logger.info('User added!')
 })
