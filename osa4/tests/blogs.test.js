@@ -48,7 +48,7 @@ describe('total likes', () => {
       url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
       likes: 2,
       __v: 0
-    }  
+    }
   ]
 
   const oneBlog = [
@@ -73,7 +73,7 @@ describe('total likes', () => {
     const result = listHelper.totalLikes(oneBlog)
     expect(result).toBe(5)
   })
-   
+
   test('of a bigger object list is calculated right', () => {
     const result = listHelper.totalLikes(blogs)
     expect(result).toBe(36)
@@ -129,7 +129,7 @@ describe('favorite blog based on likes', () => {
       url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
       likes: 2,
       __v: 0
-    }  
+    }
   ]
 
   const oneBlog = [

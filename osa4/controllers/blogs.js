@@ -1,55 +1,39 @@
 // Tämä moduuli hoitaa Routejen tapahtumankäsittelijät eli kontrollerit
 
 const blogsRouter = require('express').Router()
-const Blog = require('../models/blog')
 const logger = require('../utils/logger')
+const Blog = require('../models/blog')
+const User = require('../models/user')
 
 // Olemassa olevien blogien hakeminen
-blogsRouter.get('/', (request, response) => {
-  Blog.find({}).then(blogs => {
-      response.json(blogs)
-    })
+blogsRouter.get('/', async (req, res) => {
+  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
+  res.json(blogs)
 })
 
 // Uuden blogin lisäys
-blogsRouter.post('/', (request, response, next) => {
-  const body = request.body
-  logger.info(request.body)
-  logger.info(body.likes)
+blogsRouter.post('/', async (req, res) => {
+  const { title, author, url, likes } = req.body
+  logger.info(req.body)
+
+  const user = await User.findById('65412eaff095dfb04a091a64')
+  if (user === null) {
+    return res.status(404).json('User not found')
+  }
+  logger.info('Found user: ', user)
 
   const blog = new Blog({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes === "" ? 0 : body.likes, // Jos likes-kentän arvo on "", laitetaan arvoksi 0, muuten likes-kentälle asetettu arvo
+    title: title,
+    author: author,
+    url: url,
+    likes: likes,
+    user: user._id
   })
 
-  blog
-    .save()
-    .then(savedBlog => {
-      response.status(201).json(savedBlog)
-    }).catch(error => {
-        next(error)
-    })
-})
-
-blogsRouter.delete('/:id', async (req, res) => {
-  await Blog.findByIdAndRemove(req.params.id)
-  res.status(204).end()
-})
-
-blogsRouter.put('/:id', async (req, res) => {
-  const body = req.body
-
-  const blog = {
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes
-  }
-
-  const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blog, { new: true })
-  res.status(200).json(updatedBlog)
+  const addedBlog = await blog.save()
+  user.blogs = user.blogs.concat(addedBlog._id)
+  await user.save()
+  res.status(201).json(addedBlog)
 })
 
 module.exports = blogsRouter
