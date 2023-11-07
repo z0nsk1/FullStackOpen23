@@ -34,6 +34,8 @@ const userExtractor = async (req, res, next) => {
     const dToken = jwt.verify(token, process.env.SECRET) // Dekoodataan token
     const user = await User.findById(dToken.id) // Etsitään käyttäjä jolle token kuuluu
     req.user = user // Laitetaan käyttäjä pyynnön user-kenttään
+  } else if (req.method !== 'GET') {
+    res.status(401)
   }
   next()
 }

@@ -14,18 +14,9 @@ blogsRouter.get('/', async (req, res) => {
 
 // Uuden blogin lisäys
 blogsRouter.post('/', async (req, res) => {
-  if (req.headers.authorization === undefined) {
-    return res.status(401)
-  }
   const { title, author, url, likes } = req.body
   logger.info(req.body)
 
-  /*const decodedToken = jwt.verify(req.token, process.env.SECRET)
-  logger.info('Decoded token: ', decodedToken)
-  if (!decodedToken.id) {
-    return res.status(401).json({ error: 'token invalid' })
-  }
-*/
   const user = req.user
   logger.info(user.blogs)
 

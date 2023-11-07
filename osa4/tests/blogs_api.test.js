@@ -11,6 +11,7 @@ beforeAll(async () => {
   token = res.body.token
 })*/
 
+
 describe('getting the blogs', () => {
   test('blogs are returned as json', async () => {
     await api
@@ -18,12 +19,11 @@ describe('getting the blogs', () => {
       .expect(200) // odotetaan http-vastausta 200
       .expect('Content-Type', /application\/json/) // odotetaan sisällön tyypin olevan application/json, regex alkaa ja päättyy '/', joten tarvitaan toinen kenoviiva '\', jotta regex ei pääty liian aikaisin
   })
-
   test('right amount of blogs were returned', async () => {
+    const blogsBefore = await helpFunctions.blogsInDb()
     const res = await api.get('/api/blogs')
-    expect(res.body).toHaveLength(3) // mongodb:ssä on kolme blogia, joten odotetaan vastauksen olevan 3
+    expect(res.body).toHaveLength(blogsBefore.length)
   })
-
   test('blogs are identified with id field', async () => {
     const res = await api.get('/api/blogs')
     res.body.forEach(blog => { // tarkistetaan forEach-silmukan avulla, että jokainen blogi sisältää id-kentän
@@ -44,7 +44,7 @@ describe('addition of a blog', () => {
     console.log(result.body.id)
 
     const testBlog = {
-      title: 'Testing Testing',
+      title: 'Correct',
       author: 'Tester',
       url: 'www.example.com',
       likes: 6,
@@ -66,7 +66,7 @@ describe('addition of a blog', () => {
     const token = result.body.token
 
     const testBlog = {
-      title: 'Testing Testing',
+      title: 'Nobody likes me :(',
       author: 'Tester',
       url: 'www.example.com',
       likes: '',
@@ -108,10 +108,11 @@ describe('addition of a blog', () => {
       .expect(400)
   })
   test('without token fails with statuscode 401', async () => {
+    await api.post('/api/login').send({ username: "test", password: "test" })
     const blogsBefore = await helpFunctions.blogsInDb()
 
     const testBlog = {
-      title: 'Testing Testing',
+      title: 'My creator does not have a token',
       author: 'Tester',
       url: 'www.example.com',
       likes: 50
@@ -119,38 +120,50 @@ describe('addition of a blog', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', 'Bearer ')
       .send(testBlog)
       .expect(401)
     const allBlogs = await helpFunctions.blogsInDb()
-    expect(allBlogs.length).toHaveLength(blogsBefore.length)
+    expect(allBlogs).toHaveLength(blogsBefore.length)
   })
 })
 
 describe('deletion of a blog', () => {
   test('with valid id succeeds with status code 204 and amount of blogs in db decreases by one', async () => {
-    const blogs = await helpFunctions.blogsInDb()
-    const blogToDelete = blogs[0]
+    const result = await api.post('/api/login').send({ username: "test", password: "test" })
+    const token = result.body.token
+    const blogsBefore = await helpFunctions.blogsInDb()
+    const blogToDelete = blogsBefore[0]
 
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
-
-    const remainingNotes = await helpFunctions.blogsInDb()
-    expect(remainingNotes).toHaveLength(3)
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', 'Bearer ' + token)
+      .expect(204)
+    const blogsAfter = await helpFunctions.blogsInDb()
+    expect(blogsAfter).toHaveLength(blogsBefore.length - 1)
   })
 })
 
 describe('updating a blog', () => {
   test('with valid data succeeds with status code 204 and data has changed', async () => {
+    const result = await api.post('/api/login').send({ username: "test", password: "test" })
+    const token = result.body.token
     const testBlog = {
-      title: 'Testing Testing',
+      title: 'More Testings',
       author: 'Tester',
       url: 'www.example.com',
-      likes: 10,
+      likes: 90,
     }
     const blogs = await helpFunctions.blogsInDb()
     const blogToUpdate = blogs[0]
 
-    const res = await api.put(`/api/blogs/${blogToUpdate.id}`).send(testBlog).expect(204)
-    expect(res.body).toContain(testBlog.title, testBlog.author, testBlog.likes)
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .set('Authorization', 'Bearer ' + token)
+      .send(testBlog)
+      .expect(204)
+    const blogsAfter = await helpFunctions.blogsInDb()
+    expect(blogsAfter[0].title).toContain(testBlog.title)
   })
 })
 
