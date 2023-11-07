@@ -6,9 +6,9 @@ const api = supertest(app)
 
 describe('Adding a new user', () => {
   const newUser = {
-    username: 'testitestiiii',
-    name: 'ThisIsaTest',
-    password: 'test123'
+    username: 'test',
+    name: 'test',
+    password: 'test'
   }
   test('with valid information succeeds', async () => {
     await api

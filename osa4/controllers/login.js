@@ -27,7 +27,7 @@ loginRouter.post('/', async (req, res) => {
 
   const token = jwt.sign(userToken, process.env.SECRET) // Luodaan käyttäjälle token jsonwebtoken-kirjaston metodin sign avulla
 
-  res.status(200).send({ token, username: user.username, name: user.name }) // Lähetään vastaus pyynnön tekijälle
+  res.status(200).send({ token, username: user.username, name: user.name, id: user.id }) // Lähetään vastaus pyynnön tekijälle
   logger.info('Login successful!')
 })
 

@@ -1,4 +1,6 @@
 const logger = require('./logger')
+const jwt = require('jsonwebtoken')
+const User = require('../models/user')
 
 const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: 'unknown endpoint' })
@@ -25,8 +27,20 @@ const tokenExtractor = (req, res, next) => {
   next()
 }
 
+const userExtractor = async (req, res, next) => {
+  const authorization = req.get('authorization') // Haetaan pyynnön authorization-kenttä
+  if (authorization && authorization.startsWith('Bearer ')) {
+    const token = authorization.replace('Bearer ', '') // Erotetaan token authorization-kentästä
+    const dToken = jwt.verify(token, process.env.SECRET) // Dekoodataan token
+    const user = await User.findById(dToken.id) // Etsitään käyttäjä jolle token kuuluu
+    req.user = user // Laitetaan käyttäjä pyynnön user-kenttään
+  }
+  next()
+}
+
 module.exports = {
   unknownEndpoint,
   errorHandler,
-  tokenExtractor
+  tokenExtractor,
+  userExtractor
 }
