@@ -1,0 +1,2 @@
+Käynnistä api avaimella
+set "REACT_APP_API_KEY=032f76658654e94ca8e854ef40462b47" && npm start
