@@ -25,6 +25,7 @@
   padding: 7px;
   margin-bottom: 7px;
   margin-top: 7px;
+  background-color: aqua;
 }
 
 p {
@@ -34,4 +35,8 @@ p {
 
 .loginMessage {
   margin-bottom: 10px;
+}
+
+body {
+  background-color: lightpink;
 }

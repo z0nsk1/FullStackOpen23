@@ -1,13 +1,28 @@
 import { useState } from "react"
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, user, likeBlog, removeBlog }) => {
   const [showInfo, setShowInfo] = useState(false)
+  const [showRemove, setShowRemove] = useState(false)
 
   const hideWhenVisible = { display: showInfo ? 'none' : '' }
   const showWhenVisible = { display: showInfo ? '' : 'none' }
+  const showIfOwner = { display: showRemove ? '' : 'none'}
 
   const toggleInfo = () => {
+    if (blog.user.id === user.id) {
+      setShowRemove(true)
+    }
     setShowInfo(!showInfo)
+  }
+
+  const like = async () => {
+    likeBlog(blog)
+  }
+
+  const remove = async () => {
+    if (window.confirm(`Do you really want to remove blog "${blog.title} by ${blog.author}?`)) {
+      removeBlog(blog)
+    }
   }
 
   return (
@@ -18,8 +33,9 @@ const Blog = ({ blog }) => {
       <div style={showWhenVisible}>
         <p>{blog.title} {blog.author} <button onClick={toggleInfo}>hide</button></p>
         <p>{blog.url}</p>
-        <p>likes: {blog.likes} <button>like</button></p>
+        <p>likes: {blog.likes} <button onClick={like}>like</button></p>
         <p>{blog.user.name}</p>
+        <button style={showIfOwner} onClick={remove}>remove</button>
       </div>
     </div>
   )

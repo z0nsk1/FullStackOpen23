@@ -37,58 +37,67 @@ const App = () => {
   const [statusMessage, setStatusMessage] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
  
+  // Kaikki blogit hakeva ja järjestävä hook
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )
-  }, [blogs])
+    const getBlogs = async () => {
+      if (blogs.length) return // Estetään jatkuva useEffectin suorittaminen, jos blogien pituus on sama
+      const response = await blogService.getAll()
+      response.sort((a, b) => parseInt(b.likes) - parseInt(a.likes)) // Järjestetään tykkäyksien perusteella laskevaan järjestykseen
+      setBlogs(response) // Asetetaan haetut blogit, jotta ne tulevat näkyviin
+    }
+    getBlogs() // Jos useEffect-hookissa käyttää async-awaitia, pitää async-functio tehdä hookin sisään ja kutsua sitä erikseen hookin sisältä
+  }, [blogs]) // Päivitetään hook aina, kun blogs-taulukko muuttuu
 
+  // Hook, joka hakee kirjautuneen käyttäjän tiedot local storagesta, asettaa käyttäjän, sekä sen tokenin blogServicelle käytettäväksi, jos käyttäjä löytyi
   useEffect(() => {
-    const loggedUser = window.localStorage.getItem('loggedBlogsappUser')
-    if (loggedUser) {
-      const user = JSON.parse(loggedUser)
-      setUser(user)
-      blogService.setToken(user.token)
+    const loggedUser = window.localStorage.getItem('loggedBlogsappUser') // Haetaan kirjautunut käyttäjä local storagesta
+    if (loggedUser) { // Jos käyttäjä löytyy local storagesta...
+      const user = JSON.parse(loggedUser) // ...tehdään JSON-muotoisesta käyttäjästä olio
+      setUser(user) // Asetetaan käyttäjä
+      blogService.setToken(user.token) // Asetetaan token blogServicen käyttöön
     }
   }, [])
 
+  // blogin viitteen määritys, jotta saadaa blogForm piiloon blogin lisäyksen jälkeen
   const blogFormRef = useRef()
 
+  // Kirjautumisen käsittelijä
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
       const user = await loginService.login({
         username, password
-      })
-      setUser(user)
+      }) // Yritetään kirjautua syötetyillä käyttäjänimellä ja salasanalla
+      setUser(user) // Jos onnistui, asettaan käyttäjä
       console.log(user.token)
-      blogService.setToken(user.token)
-      setStatusMessage(`Login successful: ${username} logged in`)
+      blogService.setToken(user.token) // Asettetaan käyttäjän token blogServicen käyttöön
+      setStatusMessage(`Login successful: ${username} logged in`) 
       setTimeout(() => {setStatusMessage(null)}, 4000)
-      setUsername('')
-      SetPassword('')
-      window.localStorage.setItem('loggedBlogsappUser', JSON.stringify(user))
+      setUsername('') // Kirjautumiseen käytettävän käyttäjänimen nollaus käyttäjän asettamisen jälkeen
+      SetPassword('') // -||- salasanan -||-
+      window.localStorage.setItem('loggedBlogsappUser', JSON.stringify(user)) // Asetetaan käyttäjän tiedot JSON-muodossa local storageen (kirjautuminen pysyy sivun päivittämisestä huolimatta)
     } catch(error) {
-        setErrorMessage(`Login failed: ${error.response.data.error}`)
+        setErrorMessage(`Login failed: ${error.response.data.error}`) // Jos kirjautuminen ei onnistunut, annetaan virheilmoitus
         setTimeout(() => {setErrorMessage(null)}, 4000)
     }
     console.log('logging in as', username)
     console.log(window.localStorage.getItem('loggedBlogsappUser'))
   }
 
+  // Uloskirjautumisen käsittelijä
   const handleLogout = (event) => {
     event.preventDefault()
     setStatusMessage(`User ${user.username} logged out`)
     setTimeout(() => {setStatusMessage(null)}, 4000)
-    setUser(null)
-    window.localStorage.removeItem('loggedBlogsappUser')
+    setUser(null) // Poistetaan käyttäjän tiedot tilasta
+    window.localStorage.removeItem('loggedBlogsappUser') // Poistetaan käyttäjän tiedot local storagesta
   }
 
-  const addBlog = async (newBlog) => {
-    blogFormRef.current()
+  // Tykkäyksen käsittelijä
+  const handleLike = async (likedBlog) => {
     try {
-      await blogService.create(newBlog)
-      setStatusMessage(`a new blog added`)
+      await blogService.put(likedBlog) // Laitetaan blogServille put-pyyntö, johon annetaan parametrina tykätty blogi
+      setStatusMessage(`You liked the blog "${likedBlog.title}"`)
       setTimeout(() => {setStatusMessage(null)}, 4000)
       setBlogs([])
     } catch (error) {
@@ -97,6 +106,34 @@ const App = () => {
     }
   }
 
+  // Poistamisen käsittelijä
+  const handleRemoval = async (blogToDelete) => {
+    try {
+      await blogService.remove(blogToDelete) // Annetaan blogServicen removelle parametrina poistettava blogi
+      setStatusMessage(`Blog "${blogToDelete.title}" was deleted successsfully`)
+      setTimeout(() => {setStatusMessage(null)}, 4000)
+      setBlogs([]) // Tyhjennetään blogitaulukko, jotta hook hakee blogit uudestaan ja poistettu blogi häviää
+    } catch (error) {
+      setErrorMessage(error.response.data.error)
+      setTimeout(() => {setErrorMessage(null)}, 4000)
+    }
+  }
+
+  // Blogin lisäys
+  const addBlog = async (newBlog) => {
+    blogFormRef.current() // viitteen currentin kutsuminen kutsuu togglablen togglevisibility-funktiota, joka piilottaa lomakkeen lisäämisen jälkeen
+    try {
+      await blogService.create(newBlog) // Luodaan uusi blogservicen avulla
+      setStatusMessage(`a new blog added`)
+      setTimeout(() => {setStatusMessage(null)}, 4000)
+      setBlogs([])
+    } catch (error) {
+      setErrorMessage(error.response.data.error)
+      setTimeout(() => setErrorMessage(null), 4000)
+    }
+  }
+ 
+  // Kirjautumisnäkymä
   const loginView = () => (
     <div>
     <h2>Log in to blogsapp</h2>
@@ -124,6 +161,7 @@ const App = () => {
     </div>
   )
 
+  // Bloginäkymä, uuden luonnissa on käytetty togglable-komponenttia, jotta lomake ei näy muuta kuin create a new blogia klikatessa.
   const blogsView = () => (
     <div>
       <Togglable buttonLabel="Create a new blog" cancelLabel="cancel" ref={blogFormRef}>
@@ -131,7 +169,7 @@ const App = () => {
       </Togglable>  
       {blogs.map(blog =>
       <div className='blog' key={blog.id}>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} user={user} likeBlog={handleLike} removeBlog={handleRemoval}/>
       </div>
       )}
     </div>
