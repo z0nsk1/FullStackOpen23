@@ -144,7 +144,7 @@ const App = () => {
     <Error message={errorMessage}/>
     {!user && loginView()}
     {user && <div>
-      <p className='loginMessage'>{user.username} logged in
+      <p className='loginMessage'>{user.name} logged in
         <button onClick={handleLogout}>logout</button>
       </p>
       {blogsView()}

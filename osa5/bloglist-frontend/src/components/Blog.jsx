@@ -1,5 +1,3 @@
-import Togglable from "./Togglable"
-import BlogInfo from "./BlogInfo"
 import { useState } from "react"
 
 const Blog = ({ blog }) => {
@@ -11,16 +9,17 @@ const Blog = ({ blog }) => {
   const toggleInfo = () => {
     setShowInfo(!showInfo)
   }
+
   return (
     <div>
       <div style={hideWhenVisible}>
-      {blog.title} <button onClick={toggleInfo}>view</button>
+      {blog.title} {blog.author} <button onClick={toggleInfo}>view</button>
       </div>
       <div style={showWhenVisible}>
-        <p>{blog.title} <button onClick={toggleInfo}>hide</button></p>
+        <p>{blog.title} {blog.author} <button onClick={toggleInfo}>hide</button></p>
         <p>{blog.url}</p>
         <p>likes: {blog.likes} <button>like</button></p>
-        <p>{blog.author}</p>
+        <p>{blog.user.name}</p>
       </div>
     </div>
   )
