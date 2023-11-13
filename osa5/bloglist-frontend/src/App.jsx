@@ -5,9 +5,8 @@ import loginService from './services/login'
 import './index.css'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
-import BlogInfo from './components/BlogInfo'
 
-const Notification = ( {message} ) => {
+const Notification = ({ message }) => {
   if (message === null) {
     return null
   }
@@ -18,7 +17,7 @@ const Notification = ( {message} ) => {
   )
 }
 
-const Error = ( {message} ) => {
+const Error = ({ message }) => {
   if (message === null) {
     return null
   }
@@ -36,7 +35,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [statusMessage, setStatusMessage] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
- 
+
   // Kaikki blogit hakeva ja järjestävä hook
   useEffect(() => {
     const getBlogs = async () => {
@@ -71,14 +70,14 @@ const App = () => {
       setUser(user) // Jos onnistui, asettaan käyttäjä
       console.log(user.token)
       blogService.setToken(user.token) // Asettetaan käyttäjän token blogServicen käyttöön
-      setStatusMessage(`Login successful: ${username} logged in`) 
+      setStatusMessage(`Login successful: ${username} logged in`)
       setTimeout(() => {setStatusMessage(null)}, 4000)
       setUsername('') // Kirjautumiseen käytettävän käyttäjänimen nollaus käyttäjän asettamisen jälkeen
       SetPassword('') // -||- salasanan -||-
       window.localStorage.setItem('loggedBlogsappUser', JSON.stringify(user)) // Asetetaan käyttäjän tiedot JSON-muodossa local storageen (kirjautuminen pysyy sivun päivittämisestä huolimatta)
     } catch(error) {
-        setErrorMessage(`Login failed: ${error.response.data.error}`) // Jos kirjautuminen ei onnistunut, annetaan virheilmoitus
-        setTimeout(() => {setErrorMessage(null)}, 4000)
+      setErrorMessage(`Login failed: ${error.response.data.error}`) // Jos kirjautuminen ei onnistunut, annetaan virheilmoitus
+      setTimeout(() => {setErrorMessage(null)}, 4000)
     }
     console.log('logging in as', username)
     console.log(window.localStorage.getItem('loggedBlogsappUser'))
@@ -124,7 +123,7 @@ const App = () => {
     blogFormRef.current() // viitteen currentin kutsuminen kutsuu togglablen togglevisibility-funktiota, joka piilottaa lomakkeen lisäämisen jälkeen
     try {
       await blogService.create(newBlog) // Luodaan uusi blogservicen avulla
-      setStatusMessage(`a new blog added`)
+      setStatusMessage('a new blog added')
       setTimeout(() => {setStatusMessage(null)}, 4000)
       setBlogs([])
     } catch (error) {
@@ -132,62 +131,62 @@ const App = () => {
       setTimeout(() => setErrorMessage(null), 4000)
     }
   }
- 
+
   // Kirjautumisnäkymä
   const loginView = () => (
     <div>
-    <h2>Log in to blogsapp</h2>
-    <form onSubmit={handleLogin}>
-      <div>
+      <h2>Log in to blogsapp</h2>
+      <form onSubmit={handleLogin}>
+        <div>
         username:
-        <input
-        type="text"
-        value={username}
-        name="Username"
-        onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
+          <input
+            type="text"
+            value={username}
+            name="Username"
+            onChange={({ target }) => setUsername(target.value)}
+          />
+        </div>
+        <div>
         password:
-        <input
-        type="password"
-        value={password}
-        name="Password"
-        onChange={({ target }) => SetPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
+          <input
+            type="password"
+            value={password}
+            name="Password"
+            onChange={({ target }) => SetPassword(target.value)}
+          />
+        </div>
+        <button type="submit">login</button>
+      </form>
     </div>
   )
 
   // Bloginäkymä, uuden luonnissa on käytetty togglable-komponenttia, jotta lomake ei näy muuta kuin create a new blogia klikatessa.
   const blogsView = () => (
     <div>
-      <Togglable buttonLabel="Create a new blog" cancelLabel="cancel" ref={blogFormRef}>
+      <Togglable buttonLabel="Create a new blog" ref={blogFormRef}>
         <BlogForm createBlog={addBlog}/>
-      </Togglable>  
+      </Togglable>
       {blogs.map(blog =>
-      <div className='blog' key={blog.id}>
-        <Blog key={blog.id} blog={blog} user={user} likeBlog={handleLike} removeBlog={handleRemoval}/>
-      </div>
+        <div className='blog' key={blog.id}>
+          <Blog key={blog.id} blog={blog} user={user} likeBlog={handleLike} removeBlog={handleRemoval}/>
+        </div>
       )}
     </div>
   )
 
   return (
     <div>
-    <h1>Blogsapp</h1>
-    <Notification message={statusMessage}/>
-    <Error message={errorMessage}/>
-    {!user && loginView()}
-    {user && <div>
-      <p className='loginMessage'>{user.name} logged in
-        <button onClick={handleLogout}>logout</button>
-      </p>
-      {blogsView()}
-    </div>
-    }
+      <h1>Blogsapp</h1>
+      <Notification message={statusMessage}/>
+      <Error message={errorMessage}/>
+      {!user && loginView()}
+      {user && <div>
+        <p className='loginMessage'>{user.name} logged in
+          <button onClick={handleLogout}>logout</button>
+        </p>
+        {blogsView()}
+      </div>
+      }
     </div>
   )
 }

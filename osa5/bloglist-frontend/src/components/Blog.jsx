@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState } from 'react'
+import PropTypes, { object } from 'prop-types'
 
 const Blog = ({ blog, user, likeBlog, removeBlog }) => {
   const [showInfo, setShowInfo] = useState(false)
@@ -6,7 +7,7 @@ const Blog = ({ blog, user, likeBlog, removeBlog }) => {
 
   const hideWhenVisible = { display: showInfo ? 'none' : '' }
   const showWhenVisible = { display: showInfo ? '' : 'none' }
-  const showIfOwner = { display: showRemove ? '' : 'none'}
+  const showIfOwner = { display: showRemove ? '' : 'none' }
 
   const toggleInfo = () => {
     if (blog.user.id === user.id) {
@@ -28,7 +29,7 @@ const Blog = ({ blog, user, likeBlog, removeBlog }) => {
   return (
     <div>
       <div style={hideWhenVisible}>
-      {blog.title} {blog.author} <button onClick={toggleInfo}>view</button>
+        {blog.title} {blog.author} <button onClick={toggleInfo}>view</button>
       </div>
       <div style={showWhenVisible}>
         <p>{blog.title} {blog.author} <button onClick={toggleInfo}>hide</button></p>
@@ -39,6 +40,13 @@ const Blog = ({ blog, user, likeBlog, removeBlog }) => {
       </div>
     </div>
   )
+}
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
+  likeBlog: PropTypes.func.isRequired,
+  removeBlog: PropTypes.func.isRequired
 }
 
 export default Blog

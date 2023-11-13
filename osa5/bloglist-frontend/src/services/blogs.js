@@ -38,7 +38,6 @@ const put = async blog => {
     headers: { Authorization: token },
   }
   const response = await axios.put(`${baseUrl}/${blog.id}`, likedBlog, config)
-  console.log(response)
   return response.data
 }
 
