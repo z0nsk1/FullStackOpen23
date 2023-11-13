@@ -5,6 +5,7 @@ import loginService from './services/login'
 import './index.css'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
+import BlogInfo from './components/BlogInfo'
 
 const Notification = ( {message} ) => {
   if (message === null) {
@@ -125,12 +126,13 @@ const App = () => {
 
   const blogsView = () => (
     <div>
-      <Togglable buttonLabel="Create a new blog" ref={blogFormRef}>
+      <Togglable buttonLabel="Create a new blog" cancelLabel="cancel" ref={blogFormRef}>
         <BlogForm createBlog={addBlog}/>
-      </Togglable>
-      <h2>blogs</h2>    
+      </Togglable>  
       {blogs.map(blog =>
-      <Blog key={blog.id} blog={blog} />
+      <div className='blog' key={blog.id}>
+        <Blog key={blog.id} blog={blog} />
+      </div>
       )}
     </div>
   )
@@ -142,7 +144,7 @@ const App = () => {
     <Error message={errorMessage}/>
     {!user && loginView()}
     {user && <div>
-      <p>{user.username} logged in
+      <p className='loginMessage'>{user.username} logged in
         <button onClick={handleLogout}>logout</button>
       </p>
       {blogsView()}
