@@ -18,7 +18,6 @@ blogsRouter.post('/', async (req, res) => {
   logger.info(req.body)
 
   const user = req.user
-  logger.info(user.blogs)
 
   const blog = new Blog({
     title: title,
@@ -31,6 +30,7 @@ blogsRouter.post('/', async (req, res) => {
   const addedBlog = await blog.save()
   user.blogs = user.blogs.concat(addedBlog._id)
   await user.save()
+  logger.info(user.blogs)
   res.status(201).json(addedBlog)
 })
 
@@ -41,7 +41,10 @@ blogsRouter.delete('/:id', async (req, res) => {
     return res.status(404).json({ error: `blog with id ${req.params.id} doesn't exist` })
   }
   if (blog.user.toString() === req.user.id) { // Jos blogiin liitetyn käyttäjän id on sama kuin poiston tehneen käyttäjän id (joka selvitettiin tokenilla), poistetaan blogi
+    req.user.blogs = req.user.blogs.filter(bg => bg.toString() !== blog.id.toString()) // Filtteröidään poistettu blogi (!==) käyttäjän blogeista. Muutetaan blogien id:t merkkijonoiksi, jotta vertailutoimii (olioita ei voi verrata === operaattorilla). Käyttäjään on tallennettu ainoastaan blogien id:t.
+    console.log('after filtering', req.user.blogs)
     await Blog.findByIdAndRemove(req.params.id)
+    await req.user.save() // Tallennetaan muutos käyttäjään
     logger.info(`deleted blog with id ${req.params.id}`)
     res.status(204).end()
   } else {
