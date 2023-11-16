@@ -41,6 +41,7 @@ const App = () => {
     const getBlogs = async () => {
       if (blogs.length) return // Estetään jatkuva useEffectin suorittaminen, jos blogien pituus on sama
       const response = await blogService.getAll()
+      if (response.length === 0) return // Jos db on tyhjä, ei estetään tyhjän asetus hookkiin (johti ikuiseen silmukkaan get-metodissa)
       response.sort((a, b) => parseInt(b.likes) - parseInt(a.likes)) // Järjestetään tykkäyksien perusteella laskevaan järjestykseen
       setBlogs(response) // Asetetaan haetut blogit, jotta ne tulevat näkyviin
     }
@@ -140,6 +141,7 @@ const App = () => {
         <div>
         username:
           <input
+            id='username'
             type="text"
             value={username}
             name="Username"
@@ -149,13 +151,14 @@ const App = () => {
         <div>
         password:
           <input
+            id='password'
             type="password"
             value={password}
             name="Password"
             onChange={({ target }) => SetPassword(target.value)}
           />
         </div>
-        <button type="submit">login</button>
+        <button id='login-button' type="submit">login</button>
       </form>
     </div>
   )

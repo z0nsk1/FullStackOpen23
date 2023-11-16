@@ -9,6 +9,7 @@ const Blog = require('../models/blog')
 // Olemassa olevien blogien hakeminen
 blogsRouter.get('/', async (req, res) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 })
+  logger.info(blogs)
   res.json(blogs)
 })
 
