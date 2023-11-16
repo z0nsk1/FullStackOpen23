@@ -1,1 +1,1 @@
-Osan 5 tehtävät. Tässä osassa tehdään frontend edellisessä osassa tehdylle blogi-sovelluksen backendille. Lisäksi osassa tehdään frontendin testaamista ensin jestillä ja lopuksi end to end -testaamista cypress-kirjaston avulla.
+Osan 5 tehtävät. Tässä osassa tehdään frontend edellisessä osassa tehdylle blogi-sovelluksen backendille. Lisäksi osassa harjoitellaan frontendin testaamista ensin jestillä ja lopuksi end to end -testaamista cypress-kirjaston avulla.
