@@ -29,14 +29,14 @@ const Blog = ({ blog, user, likeBlog, removeBlog }) => {
   return (
     <div>
       <div style={hideWhenVisible} className='blogTitle'>
-        {blog.title} {blog.author} <button onClick={toggleInfo}>view</button>
+        {blog.title} {blog.author} <button id='view' onClick={toggleInfo}>view</button>
       </div>
       <div style={showWhenVisible} className='blogInfo'>
         <p>{blog.title} {blog.author} <button onClick={toggleInfo}>hide</button></p>
         <p>{blog.url}</p>
-        <p>likes: {blog.likes} <button onClick={like}>like</button></p>
+        <p>likes: {blog.likes} <button id='like' onClick={like}>like</button></p>
         <p>{blog.user.name}</p>
-        <button style={showIfOwner} onClick={remove}>remove</button>
+        <button id='remove' style={showIfOwner} onClick={remove}>remove</button>
       </div>
     </div>
   )

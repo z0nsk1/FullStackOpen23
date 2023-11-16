@@ -110,7 +110,7 @@ const App = () => {
   const handleRemoval = async (blogToDelete) => {
     try {
       await blogService.remove(blogToDelete) // Annetaan blogServicen removelle parametrina poistettava blogi
-      setStatusMessage(`Blog "${blogToDelete.title}" was deleted successsfully`)
+      setStatusMessage(`Blog "${blogToDelete.title}" was deleted successfully`)
       setTimeout(() => {setStatusMessage(null)}, 4000)
       setBlogs([]) // Tyhjennetään blogitaulukko, jotta hook hakee blogit uudestaan ja poistettu blogi häviää
     } catch (error) {
