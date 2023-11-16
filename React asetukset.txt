@@ -1,7 +1,0 @@
-npm install axios
-npm install json-server --save-dev
-
-package.json "scripts": 
-"server": "json-server -p3001 --watch db.json"
-
-npm run server
