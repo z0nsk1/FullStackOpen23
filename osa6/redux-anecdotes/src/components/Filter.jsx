@@ -10,6 +10,7 @@ const Filter = () => {
     dispatch(filterChange(filter))
   }
   const style = {
+    marginTop: 10,
     marginBottom: 10
   }
 
