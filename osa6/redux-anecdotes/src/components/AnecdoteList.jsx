@@ -20,7 +20,9 @@ const AnecdoteList = () => {
 
   return (
     <div>
-      {[...anecdotes].sort((a, b) => parseInt(b.votes) - parseInt(a.votes)).map(anecdote =>
+      {/* Anekdoottien listaus ja järjestäminen äänien perusteella, anecdotes-taulukkoon tarvitaan objectspread-syntaksia (kopioi olion), 
+      koska storen tilaa ei saa muuttaa ja sen muuttaminen antaa virheilmoituksen (jos käyttää suoraan anecdotes.sort...)*/}
+      {[...anecdotes].sort((a, b) => parseInt(b.votes) - parseInt(a.votes)).map(anecdote => 
         <div key={anecdote.id}>
           <div>{anecdote.content}</div>
           <div> 
