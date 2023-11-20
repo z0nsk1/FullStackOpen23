@@ -10,11 +10,10 @@ const AnecdoteList = () => {
     : state.anecdotes
   })
 
-  const vote = (id) => {
-    console.log('vote', id)
-    const votedAnecdote = anecdotes.find(a => a.id === id)
-    dispatch(setNotification(`You voted for the anecdote "${votedAnecdote.content}"`))
-    dispatch(addVotes(id))
+  const vote = (anecdote) => {
+    console.log('vote', anecdote.id)
+    dispatch(setNotification(`You voted for the anecdote "${anecdote.content}"`, 5))
+    dispatch(addVotes(anecdote))
     setTimeout(() => dispatch(rmNotification()), 5000)
   }
 
@@ -27,7 +26,7 @@ const AnecdoteList = () => {
           <div>{anecdote.content}</div>
           <div> 
             has {anecdote.votes}
-            <button onClick={() => vote(anecdote.id)}>vote</button>
+            <button onClick={() => vote(anecdote)}>vote</button>
           </div>
         </div>
       )}
