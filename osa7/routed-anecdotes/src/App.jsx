@@ -2,14 +2,15 @@
 /* eslint-disable react/prop-types */
 import { useState } from 'react'
 import { Routes, Route, Link, useMatch, useNavigate } from 'react-router-dom'
+import { useField } from './hooks'
 
 const Menu = () => {
   const padding = {
     paddingRight: 5
   }
-  return (
+  return ( 
     <div>
-      <Link style={padding} to="/">anecdotes</Link>
+      <Link style={padding} to="/">anecdotes</Link> 
       <Link style={padding} to="/create">create new</Link>
       <Link style={padding} to="/about">about</Link>
     </div>
@@ -65,21 +66,22 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  const content = useField('text')
+  const author = useField('text')
+  const info = useField('text')
+  console.log(content)
 
   const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault()
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.value, // Huom. content on nyt custom-hook useField:n takia olio, jossa on kentät type, value ja onChange, minkä takia pitää erikseen määrittää tällä tavalla addNew:lle vietävän olion kentät
+      author: author.value,
+      info: info.value,
       votes: 0
     })
-    navigate('/')
+    navigate('/') // Palataan luonnin jälkeen takaisin etusivulle useNavigaten avulla
   }
 
   return (
@@ -88,15 +90,15 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input {...content} />
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input {...author}/>
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
+          <input {...info} />
         </div>
         <button>create</button>
       </form>
@@ -124,7 +126,8 @@ const App = () => {
   ])
 
   const [notification, setNotification] = useState('')
-  const match = useMatch('/anecdotes/:id')
+  // Käytetään matchia selvittämään näytettävän anekdootin id
+  const match = useMatch('/anecdotes/:id') // Huom. useMatch:a ei voi käyttää amassa komponentissa, joka määrittelee sovelluksen reititettävän osan, joten Router-komponentin käyttö on siirretty main.jsx:n
 
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
@@ -147,6 +150,8 @@ const App = () => {
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
 
+  // Haetaan matchiin osuva anekdootti, huom. match.params.id pitää muuttaa numeroksi, jotta sitä voi käyttää anecdoteById:n find-metodissa
+  // Tätä anekdoottia käytetään yksittäisen anekdootin näyttävässä funktiossa, jota kutsutaan routesta
   const anecdote = match ? anecdoteById(Number(match.params.id)) : null
 
   return (
