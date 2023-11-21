@@ -8,7 +8,7 @@ const App = () => {
   const queryClient = useQueryClient()
 
   const updateAnecdoteMutation = useMutation({ // muutoksen hoitava mutaatio, vrt. lisäysmutaatio AnecdoteForm:ssa
-    mutationFn: updateAnecdote,
+    mutationFn: updateAnecdote, // kutsutaan nyt mutaten yhteydessä updateAnecdote-funktiota, jossa on axios:n put-pyyntö
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
     }
