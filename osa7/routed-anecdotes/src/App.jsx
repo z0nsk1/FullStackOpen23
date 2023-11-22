@@ -66,15 +66,17 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const content = useField('text')
-  const author = useField('text')
-  const info = useField('text')
+  // Virheilmoituksen poisto, jossa input kentälle välittyi reset:
+  // "Irroitetaan" useFieldn hookin reset-funktio hookin paluuarvosta ja laitetaan spread-syntaksilla loput propseihin
+  const { reset: resetContent, ...content } = useField('text')
+  const { reset: resetAuthor, ...author } = useField('text')
+  const { reset: resetInfo, ...info } = useField('text')
   console.log(content)
 
   const navigate = useNavigate()
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault() // Estetään submittaus heti
     props.addNew({
       content: content.value, // Huom. content on nyt custom-hook useField:n takia olio, jossa on kentät type, value ja onChange, minkä takia pitää erikseen määrittää tällä tavalla addNew:lle vietävän olion kentät
       author: author.value,
@@ -82,6 +84,15 @@ const CreateNew = (props) => {
       votes: 0
     })
     navigate('/') // Palataan luonnin jälkeen takaisin etusivulle useNavigaten avulla
+  }
+
+  const resetFields = (e) => {
+    e.preventDefault()
+    console.log("resetting...")
+    // Kutsutaan funktioita, joiksi useField:n reset-funktio on määritelty
+    resetContent()
+    resetAuthor()
+    resetInfo()
   }
 
   return (
@@ -100,7 +111,7 @@ const CreateNew = (props) => {
           url for more info
           <input {...info} />
         </div>
-        <button>create</button>
+        <button type="submit">create</button><button onClick={resetFields}>reset</button>
       </form>
     </div>
   )
