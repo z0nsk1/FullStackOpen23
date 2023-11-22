@@ -1,13 +1,15 @@
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import { configureStore } from '@reduxjs/toolkit'
-import notificationReducer from './reducers/notificationReducer'
 import { Provider } from 'react-redux'
+import notificationReducer from './reducers/notificationReducer'
+import blogReducer from './reducers/blogReducer'
 
 // Konfiguroidaan store ja sen reducerit
 const store = configureStore({
   reducer: {
-    notification: notificationReducer
+    notification: notificationReducer,
+    blogs: blogReducer
   }
 })
 

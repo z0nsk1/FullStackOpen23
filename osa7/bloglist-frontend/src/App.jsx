@@ -1,33 +1,27 @@
 import { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+
+import './index.css'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import './index.css'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import { setNotification } from './reducers/notificationReducer'
 import Notification from './components/Notification'
+import { createBlog, initializeBlogs } from './reducers/blogReducer'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, SetPassword] = useState('')
   const [user, setUser] = useState(null)
 
   const dispatch = useDispatch()
+  const blogsToShow = useSelector(state => state.blogs)
 
-  // Kaikki blogit hakeva ja järjestävä hook
   useEffect(() => {
-    const getBlogs = async () => {
-      if (blogs.length) return // Estetään jatkuva useEffectin suorittaminen, jos blogien pituus on sama
-      const response = await blogService.getAll()
-      if (response.length === 0) return // Jos db on tyhjä, estetään tyhjän taulukon asettaminen hookkiin (johti ikuiseen silmukkaan get-metodissa)
-      response.sort((a, b) => parseInt(b.likes) - parseInt(a.likes)) // Järjestetään tykkäyksien perusteella laskevaan järjestykseen
-      setBlogs(response) // Asetetaan haetut blogit, jotta ne tulevat näkyviin
-    }
-    getBlogs() // Jos useEffect-hookissa käyttää async-awaitia, pitää async-functio tehdä hookin sisään ja kutsua sitä erikseen hookin sisältä
-  }, [blogs]) // Päivitetään hook aina, kun blogs-taulukko muuttuu
+    blogService.getAll().then(blogs => { dispatch(initializeBlogs(blogs)) })
+  }, [dispatch])
 
   // Hook, joka hakee kirjautuneen käyttäjän tiedot local storagesta, asettaa käyttäjän, sekä sen tokenin blogServicelle käytettäväksi, jos käyttäjä löytyi
   useEffect(() => {
@@ -76,7 +70,6 @@ const App = () => {
     try {
       await blogService.put(likedBlog) // Laitetaan blogServille put-pyyntö, johon annetaan parametrina tykätty blogi
       dispatch(setNotification(`You liked the blog "${likedBlog.title}"`, 'status'))
-      setBlogs([])
     } catch (error) {
       dispatch(setNotification(error.response.data.error))
     }
@@ -87,19 +80,6 @@ const App = () => {
     try {
       await blogService.remove(blogToDelete) // Annetaan blogServicen removelle parametrina poistettava blogi
       dispatch(setNotification(`Blog "${blogToDelete.title}" was deleted successfully`, 'status'))
-      setBlogs([]) // Tyhjennetään blogitaulukko, jotta hook hakee blogit uudestaan ja poistettu blogi häviää
-    } catch (error) {
-      dispatch(setNotification(error.response.data.error))
-    }
-  }
-
-  // Blogin lisäys
-  const addBlog = async (newBlog) => {
-    blogFormRef.current() // viitteen currentin kutsuminen kutsuu togglablen togglevisibility-funktiota, joka piilottaa lomakkeen lisäämisen jälkeen
-    try {
-      await blogService.create(newBlog) // Luodaan uusi blogservicen avulla
-      dispatch(setNotification('a new blog added', 'status'))
-      setBlogs([])
     } catch (error) {
       dispatch(setNotification(error.response.data.error))
     }
@@ -139,9 +119,9 @@ const App = () => {
   const blogsView = () => (
     <div>
       <Togglable buttonLabel="Create a new blog" ref={blogFormRef}>
-        <BlogForm createBlog={addBlog}/>
+        <BlogForm />
       </Togglable>
-      {blogs.map(blog =>
+      {blogsToShow.map(blog =>
         <div className='blog' key={blog.id}>
           <Blog key={blog.id} blog={blog} user={user} likeBlog={handleLike} removeBlog={handleRemoval}/>
         </div>

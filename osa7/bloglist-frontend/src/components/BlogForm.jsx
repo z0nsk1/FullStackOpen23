@@ -1,20 +1,20 @@
 import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { createBlog } from '../reducers/blogReducer'
+import { setNotification } from '../reducers/notificationReducer'
 
-const NewBlogForm = ({ createBlog }) => {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+const NewBlogForm = () => {
+  const dispatch = useDispatch()
 
   const addBlog = (event) => {
     event.preventDefault()
-    createBlog({
-      title: title,
-      author: author,
-      url: url
-    })
-    setTitle('')
-    setAuthor('')
-    setUrl('')
+    const title = event.target.Title.value // talletaan inputtien data nimen perusteella muuttujiin
+    const author = event.target.Author.value
+    const url = event.target.Url.value
+    console.log(title)
+
+    dispatch(createBlog({ title: title, author: author, url: url })) // dispatchataan muuttujat oliona blogreducerille
+    dispatch(setNotification('a new blog added', 'status'))
   }
 
 
@@ -27,9 +27,7 @@ const NewBlogForm = ({ createBlog }) => {
           <input
             id="title"
             type="text"
-            value={title}
             name="Title"
-            onChange={event => setTitle(event.target.value)}
           />
         </div>
         <div>
@@ -37,9 +35,7 @@ const NewBlogForm = ({ createBlog }) => {
           <input
             id="author"
             type="text"
-            value={author}
             name="Author"
-            onChange={event => setAuthor(event.target.value)}
           />
         </div>
         <div>
@@ -47,9 +43,7 @@ const NewBlogForm = ({ createBlog }) => {
           <input
             id="url"
             type="text"
-            value={url}
             name="Url"
-            onChange={event => setUrl(event.target.value)}
           />
         </div>
         <button id="create" type="submit">create</button>
