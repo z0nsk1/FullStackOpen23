@@ -10,7 +10,7 @@ const blogSlice = createSlice({
       return action.payload
     },
     addBlog(state, action) {
-      state.concat(action.payload)
+      return state.concat(action.payload)
     }
   }
 })
@@ -30,7 +30,8 @@ export const createBlog = (newBlog) => {
   return async dispatch => {
     try {
       const blog = await blogService.create(newBlog)
-      dispatch(addBlog(blog))
+      //dispatch(addBlog(blog))
+      dispatch(initializeBlogs()) // väliaikainen ratkaisu, kunnes saadaan kirjautunut käyttäjä globaaliin tilaan. Huono, koska tekee get-metodin jokaisella kerralla (ei tosin merkitystä tämän kokoisessa sovelluksessa)
     } catch (error) {
       dispatch(setNotification(error.response.data.error))
     }

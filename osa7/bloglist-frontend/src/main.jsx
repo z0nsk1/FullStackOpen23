@@ -4,12 +4,14 @@ import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 import notificationReducer from './reducers/notificationReducer'
 import blogReducer from './reducers/blogReducer'
+import loginReducer from './reducers/loginReducer'
 
 // Konfiguroidaan store ja sen reducerit
 const store = configureStore({
   reducer: {
     notification: notificationReducer,
-    blogs: blogReducer
+    blogs: blogReducer,
+    login: loginReducer
   }
 })
 
