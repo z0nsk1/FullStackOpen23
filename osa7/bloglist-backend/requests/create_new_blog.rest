@@ -1,0 +1,11 @@
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBvbGxlUCIsImlkIjoiNjU0M2FiZGMyMTBkMjEzYWYzNGQwYTgyIiwiaWF0IjoxNjk4OTUyOTM2fQ.w6MnnoBeD0tIy3Xtmv66PMGQ4QyU3F9aE3FDuFtUcHc
+
+{
+  "title": "Mikä on elämän tarkoitus?",
+  "author": "Polle Pohtija",
+  "url": "http://localhost:3001/api/blogs",
+  "likes": 25,
+  "userId": "6543abdc210d213af34d0a82"
+}
