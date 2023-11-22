@@ -9,7 +9,7 @@ import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import { setNotification } from './reducers/notificationReducer'
 import Notification from './components/Notification'
-import { createBlog, initializeBlogs } from './reducers/blogReducer'
+import { initializeBlogs } from './reducers/blogReducer'
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -20,7 +20,7 @@ const App = () => {
   const blogsToShow = useSelector(state => state.blogs)
 
   useEffect(() => {
-    blogService.getAll().then(blogs => { dispatch(initializeBlogs(blogs)) })
+    dispatch(initializeBlogs())
   }, [dispatch])
 
   // Hook, joka hakee kirjautuneen käyttäjän tiedot local storagesta, asettaa käyttäjän, sekä sen tokenin blogServicelle käytettäväksi, jos käyttäjä löytyi
@@ -65,26 +65,6 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogsappUser') // Poistetaan käyttäjän tiedot local storagesta
   }
 
-  // Tykkäyksen käsittelijä
-  const handleLike = async (likedBlog) => {
-    try {
-      await blogService.put(likedBlog) // Laitetaan blogServille put-pyyntö, johon annetaan parametrina tykätty blogi
-      dispatch(setNotification(`You liked the blog "${likedBlog.title}"`, 'status'))
-    } catch (error) {
-      dispatch(setNotification(error.response.data.error))
-    }
-  }
-
-  // Poistamisen käsittelijä
-  const handleRemoval = async (blogToDelete) => {
-    try {
-      await blogService.remove(blogToDelete) // Annetaan blogServicen removelle parametrina poistettava blogi
-      dispatch(setNotification(`Blog "${blogToDelete.title}" was deleted successfully`, 'status'))
-    } catch (error) {
-      dispatch(setNotification(error.response.data.error))
-    }
-  }
-
   // Kirjautumisnäkymä
   const loginView = () => (
     <div>
@@ -123,7 +103,7 @@ const App = () => {
       </Togglable>
       {blogsToShow.map(blog =>
         <div className='blog' key={blog.id}>
-          <Blog key={blog.id} blog={blog} user={user} likeBlog={handleLike} removeBlog={handleRemoval}/>
+          <Blog key={blog.id} blog={blog} user={user}/>
         </div>
       )}
     </div>

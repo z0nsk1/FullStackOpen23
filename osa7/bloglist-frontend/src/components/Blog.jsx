@@ -1,9 +1,14 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
+import { likeBlog, removeBlog } from '../reducers/blogReducer'
+import { useDispatch } from 'react-redux'
+import { setNotification } from '../reducers/notificationReducer'
 
-const Blog = ({ blog, user, likeBlog, removeBlog }) => {
+const Blog = ({ blog, user }) => {
   const [showInfo, setShowInfo] = useState(false)
   const [showRemove, setShowRemove] = useState(false)
+
+  const dispatch = useDispatch()
 
   const hideWhenVisible = { display: showInfo ? 'none' : '' }
   const showWhenVisible = { display: showInfo ? '' : 'none' }
@@ -16,13 +21,15 @@ const Blog = ({ blog, user, likeBlog, removeBlog }) => {
     setShowInfo(!showInfo)
   }
 
-  const like = async () => {
-    likeBlog(blog)
+  const like = () => {
+    dispatch(likeBlog(blog))
+    dispatch(setNotification(`You liked liked the blog ${blog.title}`, 'status'))
   }
 
   const remove = async () => {
     if (window.confirm(`Do you really want to remove blog "${blog.title} by ${blog.author}?`)) {
-      removeBlog(blog)
+      dispatch(removeBlog(blog))
+      dispatch(setNotification(`Blog "${blog.title}" was deleted successfully`, 'status'))
     }
   }
 

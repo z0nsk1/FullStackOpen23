@@ -28,13 +28,7 @@ const create = async newBlog => {
 // Tykkäyksien päivitys, lähetetään put-pyyntö, jossa on blogin entiset tiedot, sekä likes on lisätty 1
 // Myös put-pyynnön mukana tarvitaa token
 const put = async blog => {
-  const likedBlog = {
-    user: blog.user.id,
-    likes: blog.likes + 1,
-    author: blog.author,
-    title: blog.title,
-    url: blog.url
-  }
+  const likedBlog = { ...blog, likes: blog.likes + 1 }
   const config = {
     headers: { Authorization: token },
   }
